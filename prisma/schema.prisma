@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  role      String   @default("operator")
+  createdAt DateTime @default(now())
+}
+
+model Envelope {
+  id        String                  @id @default(cuid())
+  name      String
+  emoji     String?
+  protected Boolean                 @default(false)
+  active    Boolean                 @default(true)
+  /// Objectif budgétaire optionnel (pour la progression façon e-track)
+  budgetTarget Int?
+  /// Pourcentage recommandé / par défaut (0-100)
+  defaultPercent Float?
+  /// Classification: "blocked" | "flex"
+  classification String?
+  createdAt DateTime                @default(now())
+  items     DistributionRuleItem[]
+  allocs    TransactionAllocation[]
+  recurringCharges RecurringCharge[]
+}
+
+model Service {
+  id        String        @id @default(cuid())
+  name      String
+  active    Boolean       @default(true)
+  createdAt DateTime      @default(now())
+  txs       Transaction[]
+}
+
+model Transaction {
+  id        String                  @id @default(cuid())
+  kind      String
+  label     String
+  amount    Int
+  at        DateTime
+  serviceId String?
+  service   Service?                @relation(fields: [serviceId], references: [id])
+  allocs    TransactionAllocation[]
+  anomalies Anomaly[]
+}
+
+model TransactionAllocation {
+  id            String      @id @default(cuid())
+  transactionId String
+  envelopeId    String
+  amount        Int
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
+  envelope      Envelope    @relation(fields: [envelopeId], references: [id])
+}
+
+model DistributionRule {
+  id       String                 @id @default(cuid())
+  startsAt DateTime
+  endsAt   DateTime?
+  items    DistributionRuleItem[]
+}
+
+model DistributionRuleItem {
+  id         String           @id @default(cuid())
+  ruleId     String
+  envelopeId String
+  percent    Int
+  rule       DistributionRule @relation(fields: [ruleId], references: [id])
+  envelope   Envelope         @relation(fields: [envelopeId], references: [id])
+}
+
+model Anomaly {
+  id            String       @id @default(cuid())
+  level         String
+  code          String
+  details       String
+  createdAt     DateTime     @default(now())
+  resolvedAt    DateTime?
+  transactionId String?
+  tx            Transaction? @relation(fields: [transactionId], references: [id])
+}
+
+// ChargeType supprimé dans la refactorisation: aucun modèle de type séparé
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  action    String
+  metaJson  String?
+  createdAt DateTime @default(now())
+}
+
+model RecurringCharge {
+  id         String   @id @default(cuid())
+  name       String
+  amount     Int
+  frequency  String   @default("monthly") // monthly, weekly, yearly
+  envelopeId String?  
+  envelope   Envelope? @relation(fields: [envelopeId], references: [id])
+  createdAt  DateTime @default(now())
+}

@@ -1,0 +1,23 @@
+name: Low Coverage Cron
+
+on:
+  schedule:
+    - cron: '0 4 * * *' # daily at 04:00 UTC
+
+jobs:
+  run-low-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call Low Coverage API
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+          JOB_SECRET: ${{ secrets.JOB_SECRET }}
+        run: |
+          if [ -z "$APP_URL" ] || [ -z "$JOB_SECRET" ]; then
+            echo "APP_URL or JOB_SECRET not set in secrets. Aborting." && exit 1
+          fi
+          echo "Calling $APP_URL/api/_internal/runLowCoverage"
+          curl -s -X POST "$APP_URL/api/_internal/runLowCoverage" -H "x-job-secret: $JOB_SECRET" -o response.json || true
+          cat response.json || true
+
+

@@ -1,0 +1,10 @@
+{
+  "/(app)/settings/distribution/page": "app/(app)/settings/distribution/page.js",
+  "/(app)/anomalies/page": "app/(app)/anomalies/page.js",
+  "/(app)/transactions/page": "app/(app)/transactions/page.js",
+  "/(app)/reports/page": "app/(app)/reports/page.js",
+  "/(app)/expenses/page": "app/(app)/expenses/page.js",
+  "/(app)/distribution/page": "app/(app)/distribution/page.js",
+  "/(app)/settings/envelopes/page": "app/(app)/settings/envelopes/page.js",
+  "/(app)/settings/services/page": "app/(app)/settings/services/page.js"
+}

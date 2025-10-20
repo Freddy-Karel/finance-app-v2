@@ -1,0 +1,7 @@
+{
+  "css.lint.unknownAtRules": "ignore",
+  "scss.lint.unknownAtRules": "ignore",
+  "less.lint.unknownAtRules": "ignore",
+  // Optionally disable stylelint diagnostics in editor if stylelint is not configured
+  "stylelint.enable": true
+}
